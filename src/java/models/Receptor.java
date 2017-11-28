@@ -13,7 +13,7 @@ import java.sql.Date;
  */
 public class Receptor {
     
-    private String name;
+    private String nombre;
     private String apellidos;
     private Date fecha_nacimiento;
     private String sexo;
@@ -22,7 +22,7 @@ public class Receptor {
     private String ubicacion;
 
     public Receptor(String name, String apellidos, Date fecha_nacimiento, String sexo, String sangre, String diagnostico, String ubicacion) {
-        this.name = name;
+        this.nombre = name;
         this.apellidos = apellidos;
         this.fecha_nacimiento = fecha_nacimiento;
         this.sexo = sexo;
@@ -35,12 +35,12 @@ public class Receptor {
         
     }
 
-    public String getName() {
-        return name;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNombre(String name) {
+        this.nombre = name;
     }
 
     public String getApellidos() {

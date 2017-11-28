@@ -26,7 +26,7 @@ import models.Donador;
  *
  * @author juans
  */
-@WebServlet(name = "RegistroDonadorServlet", urlPatterns = {"/registro/donador"})
+@WebServlet(name = "RegistroDonadorServlet", urlPatterns = {"/registroDonador"})
 public class RegistroDonadorServlet extends HttpServlet {
 
     /**
@@ -95,10 +95,10 @@ public class RegistroDonadorServlet extends HttpServlet {
         
         //Create donador object
         Donador donador = new Donador(request.getParameter("nombre"),
-                                      request.getParameter("apellidos"),
+                                      request.getParameter("apellidoP") + " " +  request.getParameter("apellidoM"),
                                       fechaNacimiento,
                                       request.getParameter("sexo"),
-                                      request.getParameter("sangre"),
+                                      request.getParameter("sangre2") + request.getParameter("sangre1"),
                                       request.getParameter("email"),
                                       request.getParameter("telefono"),
                                       request.getParameter("direccion"),
@@ -112,9 +112,13 @@ public class RegistroDonadorServlet extends HttpServlet {
         DonadorDAO donadorDao = new DonadorDAO(conn);
         donadorDao.insert(donador);
 
+        Boolean isReg = true;
+        
         // set User object in request object and set URL
-        request.setAttribute("user", donador);
-        url = "/info.jsp"; // the "thanks" page
+        
+        request.setAttribute("isReg", isReg);
+        request.setAttribute("donador", donador);
+        url = "/index.jsp"; // the "thanks" page
 
             
         // forward request and response objects to specified URL

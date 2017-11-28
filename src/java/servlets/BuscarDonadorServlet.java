@@ -81,7 +81,7 @@ public class BuscarDonadorServlet extends HttpServlet {
         
         String parameter = request.getParameter("parameter");
         String value = request.getParameter("value");
-
+        
         //Make DB connection
          DBConnection dbConn = new DBConnection();
          Connection conn = dbConn.getConnection();

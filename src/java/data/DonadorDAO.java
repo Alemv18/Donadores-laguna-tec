@@ -43,7 +43,7 @@ public class DonadorDAO {
     
     public void insert(Donador donador) {
         try { 
-            statement = connection.prepareStatement("INSERT INTO donador VALUES (?,?,?,?,?,?,?,?,?)");
+            statement = connection.prepareStatement("INSERT INTO donador(nombre,apellidos,fecha_nacimiento,sexo,sangre,email,telefono,direccion,cp) VALUES (?,?,?,?,?,?,?,?,?)");
             synchronized(statement) {
                 statement.setString(1, donador.getNombre());
                 statement.setString(2, donador.getApellidos());
@@ -99,6 +99,29 @@ public class DonadorDAO {
             throw new RuntimeException(sqle);
         }
         return result;  
+    }
+    
+    public ArrayList<Donador> selectAll(){
+    
+        ArrayList<Donador> donadores = new ArrayList<>();
+        try {
+            statement = connection.prepareStatement("SELECT * FROM donador");
+            ResultSet rs = statement.executeQuery();
+            
+            
+            while (rs.next()){              
+                Donador donador = new Donador(rs.getString("nombre"),rs.getString("apellidos"),rs.getDate("fecha_nacimiento"),rs.getString("sexo"),rs.getString("sangre"),rs.getString("email"),rs.getString("telefono"),rs.getString("direccion"), rs.getInt("cp"));           
+                donadores.add(donador);
+            }
+        }
+        catch (SQLException sqle) {
+            logger.log(Level.SEVERE, sqle.toString(), sqle);
+            throw new RuntimeException(sqle);
+        }
+        logger.log(Level.INFO, donadores.getClass().getSimpleName() + "\n" + donadores.getClass().getName());
+        return donadores;
+        
+
     }
     
    
