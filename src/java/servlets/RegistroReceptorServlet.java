@@ -29,6 +29,8 @@ import models.Receptor;
  */
 @WebServlet(name = "RegistroReceptorServlet", urlPatterns = {"/registroReceptor"})
 public class RegistroReceptorServlet extends HttpServlet {
+    
+    public static String message = "";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -67,7 +69,7 @@ public class RegistroReceptorServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String url = "";
+        
         
         //Parse birthdate before creating object
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -96,20 +98,13 @@ public class RegistroReceptorServlet extends HttpServlet {
 
         ReceptorDAO receptorDao = new ReceptorDAO(conn);
         receptorDao.insert(receptor);
-
-        Boolean isReg = true;
         
         // set User object in request object and set URL
+        String resp = "true";
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(message);
         
-        request.setAttribute("isReg", isReg);
-        request.setAttribute("donador", receptor);
-        url = "admin-site/index.html"; // the "thanks" page
-
-            
-        // forward request and response objects to specified URL
-        getServletContext()
-        .getRequestDispatcher(url)
-        .forward(request, response);
     }
 
     /**

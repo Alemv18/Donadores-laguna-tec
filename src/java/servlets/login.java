@@ -32,6 +32,7 @@ import org.json.JSONObject;
 public class login extends HttpServlet {
     
     private static final Logger logger = Logger.getLogger(login.class.getName());
+    public static String message = "";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -71,7 +72,7 @@ public class login extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String url = "";
-        String message = "";
+        
         
         String user = request.getParameter("user");
         String password = request.getParameter("password");
@@ -86,7 +87,7 @@ public class login extends HttpServlet {
          Connection conn = dbConn.getConnection();
 
          UserDAO usuarioDao = new UserDAO(conn);
-         Boolean isAuth = usuarioDao.search(user, password, message);
+         Boolean isAuth = usuarioDao.search(user, password);
 
          if (isAuth){
             

@@ -39,7 +39,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <table id="donadores" class="table">
+                                <table id="donadores" class="table" style="display: none">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">id</th>
@@ -54,10 +54,14 @@
                                             <th scope="col">CP</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="donadores-body">
 
                                     </tbody>
                                 </table>
+                                <div class="container" style="  align-items: center;   justify-content: center;   display: flex;">
+                                    <button id="donador-btn" class="btn" style="display: none; font-size: large;   margin-top: 2em;   color: white;  background-color: orangered;">
+                                        Agregar/Editar</button>
+                                </div>
                             </div>
                         </div> <!-- .cd-project-info -->
                     </li>
@@ -76,7 +80,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <table id="receptores" class="table">
+                                <table id="receptores" class="table" style="display: none">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">id</th>
@@ -89,10 +93,16 @@
                                             <th scope="col">Ubicación</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="receptores-body">
 
                                     </tbody>
                                 </table>
+                                <div class="container" style="  align-items: center;   justify-content: center;   display: flex;">
+                                    <button id="agregarReceptor-btn" class="btn" style="display: none; font-size: large;   margin: 2em;   color: white;  background-color: orangered;">
+                                        Agregar</button>
+                                    <button id="editarReceptor-btn" class="btn" style="display: none; font-size: large;   margin: 2em;   color: white;  background-color: orangered;">
+                                        Editar</button>
+                                </div>
                             </div>
                         </div> <!-- .cd-project-info -->
                     </li>
@@ -112,7 +122,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <table id="donaciones" class="table">
+                                <table id="donaciones" class="table" style="display: none">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">Id Receptor</th>
@@ -125,43 +135,180 @@
                                             <th scope="col">Comentarios</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="donaciones-body">
 
                                     </tbody>
                                 </table>
+                                <div class="container" style="  align-items: center;   justify-content: center;   display: flex;">
+                                    <button id="donacion-btn" class="btn" style="display: none; font-size: large;   margin-top: 2em;   color: white;  background-color: orangered;">
+                                        Agregar/Editar</button>
+                                </div>
                             </div>
                         </div> <!-- .cd-project-info -->
                     </li>
                 </ul>
             </div> <!-- .cd-projects-container -->
+            
+            
+            
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+              <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
+                    <h4 class="modal-title">Receptores</h4>
+                  </div>
+                  <div class="modal-body">
+                                                
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button"  class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            
             <!-- Bootstrap core JavaScript -->
             <script src="../vendor/jquery/jquery.min.js"></script>
             <script>
                 $(document).ready(function(){
                     $("#btnDonadores").click(function() {
                       $.get("../donadores", function(response){
-                         $.each(response, function(i, item) {
-                            var $tr = $('<tr>').append(
-                                $('<td>').text(item.id),    
-                                $('<td>').text(item.nombre),
-                                $('<td>').text(item.apellidos),
-                                $('<td>').text(item.fecha_nacimiento),
-                                $('<td>').text(item.sexo),
-                                $('<td>').text(item.sangre),
-                                $('<td>').text(item.email),
-                                $('<td>').text(item.telefono),
-                                $('<td>').text(item.direccion),
-                                $('<td>').text(item.cp)
-
-                            ).appendTo('#donadores');
-                            //console.log($tr.wrap('<p>').html());
-                         });
+                         $("#donadores-body").empty();
+                         updateTable("donadores",response);
+                         $("#donadores").show();
+                         $("#donador-btn").show();
                        });  
                     });
-
+                    
                     $("#btnReceptores").click(function() {
                       $.get("../receptores", function(response){
-                         $.each(response, function(i, item) {
+                            $("#receptores-body").empty();
+                             updateTable("receptores",response);
+
+                             $("#receptores").show();
+                             $("#agregarReceptor-btn").show();
+                             $("#editarReceptor-btn").show();
+                              //console.log($tr.wrap('<p>').html());
+                             });
+                           
+                           
+                    });
+
+                    $("#btnDonaciones").click(function() {
+                      $.get("../donaciones", function(response){
+                        
+                            $("#donaciones-body").empty();
+                            updateTable("donaciones",reponse);
+                            $("#donaciones").show();
+                            $("#donacion-btn").show();
+                         });  
+                    });
+                    
+                    
+                   
+                    $("#agregarReceptor-btn").click(function(){
+                       $.ajax({
+                            type:"GET",
+                            dataType: 'html',
+                            url: 'agregarReceptorModal.html',
+                            success: function(html){
+                                console.log(html);
+                                $(".modal-body").html(html);
+                                $("#receptor-form").submit(function(e){
+                                    return false;
+                                });
+                                $("#receptor-submit").click(function(){
+                                    var data = $("#receptor-form").serialize();
+                                    console.log(data);
+                                    $.post("../registroReceptor",data,function(message, status){
+                                        console.log(message, status);
+                                        console.log("Status: " + status);
+                                        if (message){
+                                            window.prompt(message);
+                                        }
+                                        if (status === "success") {
+                                            $("#myModal").modal('hide');
+                                            updateTable("receptores");
+                                        }
+                                    });
+                                });
+                                
+                                
+                            }
+                          });
+                       
+                       $("#myModal").modal(); 
+                    });
+                    
+                    $("#editarReceptor-btn").click(function(){
+                       $.ajax({
+                            type:"GET",
+                            dataType: 'html',
+                            url: 'editarReceptorModal.html',
+                            success: function(html){
+                                console.log(html);
+                                $(".modal-body").html(html);
+                                 $.get("../receptores", function(response){
+                                   
+                                     $.each(response, function(i, item) {
+                                            $('#lista-receptores').append($('<option>').text(JSON.stringify(item))).attr('value', item.id);
+                                     });
+                                     
+                                     $("#lista-receptores").change(function(){
+                                         
+                                         fillForm($("#lista-receptores").val(),"receptor");
+                                     })
+                                     
+                                      //console.log($tr.wrap('<p>').html());
+                                     });
+                                $("#receptor-form").submit(function(e){
+                                    return false;
+                                });
+                                $("#receptor-submit").click(function(){
+                                    var data = $("#receptor-form").serialize();
+                                    console.log(data);
+                                    $.post("../registroReceptor",data,function(message, status){
+                                        console.log(message, status);
+                                        console.log("Status: " + status);
+                                        if (message){
+                                            window.prompt(message);
+                                        }
+                                        if (status === "success") {
+                                            $("#myModal").modal('hide');
+                                            updateTable("receptores");
+                                        }
+                                    });
+                                });
+                                
+                                
+                            }
+                          });
+                       
+                       $("#myModal").modal(); 
+                    });
+                    
+                    function fillForm(string,formId){
+                        var receptor = JSON.parse(string);
+                        $("#nombre-" + formId).val(receptor.nombre);
+                        $("#apellidoP-" + formId).val(receptor.apellidos);
+                        
+                        $("#nacimiento-" + formId).val(receptor.fecha_nacimiento.toISOString());
+                        $("#sexo-" + formId).val(receptor.sexo);
+                        (receptor.sangre.includes("-")) ? $("#sangre1-" + formId).val("-") : $("#sangre1-" + formId).val("+");
+                        var matches = receptor.sangre.match(/[a-zA-Z]+/);
+                        $("#sangre2-" + formId).val(matches);
+                        $("#diagnostico-" + formId).val(receptor.diagnostico);
+                        $("#ubicacion-" + formId).val(receptor.ubicacion);
+                    }
+                    
+                    function updateTable(id,response){
+                        $.each(response, function(i, item) {
                             var $tr = $('<tr>').append(
                                 $('<td>').text(item.id),    
                                 $('<td>').text(item.nombre),
@@ -172,30 +319,9 @@
                                 $('<td>').text(item.diagnostico),
                                 $('<td>').text(item.ubicacion)
 
-                            ).appendTo('#receptores');
-                            //console.log($tr.wrap('<p>').html());
-                           });
-                         });  
-                    });
-
-                    $("#btnDonaciones").click(function() {
-                      $.get("../donaciones", function(response){
-                         $.each(response, function(i, item) {
-                            var $tr = $('<tr>').append(
-                                $('<td>').text(item.receptor.id),
-                                $('<td>').text(item.receptor.nombre),
-                                $('<td>').text(item.donador.id),
-                                $('<td>').text(item.donador.nombre),
-                                $('<td>').text(item.id),
-                                $('<td>').text(item.fecha_donacion),
-                                $('<td>').text(item.ubicacion),
-                                $('<td>').text(item.comentarios),
-
-                            ).appendTo('#donaciones');
-                            //console.log($tr.wrap('<p>').html());
-                            });
-                         });  
-                    });
+                            ).appendTo('#' + id);
+                        });
+                    }
 
                 });
             </script>

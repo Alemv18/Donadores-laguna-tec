@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Donador;
 import models.Receptor;
+import servlets.RegistroReceptorServlet;
 
 /**
  *
@@ -44,7 +45,7 @@ public class ReceptorDAO {
     
     public void insert(Receptor receptor) {
         try { 
-            statement = connection.prepareStatement("INSERT INTO receptor(nombre,apellidos,fecha_nacimiento,sexo,sangre,diagnostico,ubicacion,) VALUES (?,?,?,?,?,?,?)");
+            statement = connection.prepareStatement("INSERT INTO receptor(nombre,apellidos,fecha_nacimiento,sexo,sangre,diagnostico,ubicacion) VALUES (?,?,?,?,?,?,?)");
             synchronized(statement) {
                 statement.setString(1, receptor.getNombre());
                 statement.setString(2, receptor.getApellidos());
@@ -56,10 +57,12 @@ public class ReceptorDAO {
                 statement.executeUpdate();
             }
             statement.close();
+            
         }
         catch (SQLException sqle) {
             logger.log(Level.SEVERE, sqle.toString(), sqle);
-            throw new RuntimeException(sqle);
+            RegistroReceptorServlet.message = "Error agregando receptor";
+            
         }
     }
     

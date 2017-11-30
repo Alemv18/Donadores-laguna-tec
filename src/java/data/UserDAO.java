@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Donador;
+import servlets.login;
 
 /**
  *
@@ -41,7 +42,7 @@ public class UserDAO {
         this.connection = connection;
     }
     
-    public Boolean search(String usuario, String password, String message){
+    public Boolean search(String usuario, String password){
     
         try {
             statement = connection.prepareStatement("SELECT * FROM usuario WHERE usuario = ?");
@@ -50,33 +51,35 @@ public class UserDAO {
             }
             
             ResultSet rs = statement.executeQuery();
+            login.message="Usuario no encontrado";
             
             while(rs.next()){
 
                 String u = rs.getString("usuario");
                 String p = rs.getString("clave");
 
-                if (rs.getString("usuario") != null){
+                if (!(u.isEmpty()) && u != null){
                     if (password.equals(rs.getString("clave"))){
-                        message = "Ingreso Exitoso";
+                        login.message = "Ingreso Exitoso";
                         return true;
 
 
                     }
                     else{
-                        message = "Contraseña no valida";
+                        login.message = "Contraseña no valida";
                     }
                 }
                 else {
-                    message = "Usuario no existente";
+                    login.message = "Usuario no existente";
                 }
             }
+            
             
             
         }
         catch (SQLException sqle) {
             logger.log(Level.SEVERE, sqle.toString(), sqle);
-            message = "Usuario no existente";
+            login.message = "Usuario no existente";
         }
         return false;  
     }
