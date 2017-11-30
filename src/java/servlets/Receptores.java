@@ -7,9 +7,9 @@ package servlets;
 
 import com.google.gson.Gson;
 import data.DBConnection;
-import data.DonadorDAO;
 import data.ReceptorDAO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
@@ -17,15 +17,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import models.Donador;
 import models.Receptor;
 
 /**
  *
  * @author juans
  */
-@WebServlet(name = "Donadores", urlPatterns = {"/donadores"})
-public class Donadores extends HttpServlet {
+@WebServlet(name = "Receptores", urlPatterns = {"/receptores"})
+public class Receptores extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,6 +35,7 @@ public class Donadores extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -49,14 +49,14 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          //Make DB connection
+       
         DBConnection dbConn = new DBConnection();
         Connection conn = dbConn.getConnection();
 
-        DonadorDAO donadorDao = new DonadorDAO(conn);
-        ArrayList<Donador> donadores = donadorDao.selectAll();
+        ReceptorDAO receptorDao = new ReceptorDAO(conn);
+        ArrayList<Receptor> receptores = receptorDao.selectAll();
 
-        String json = new Gson().toJson(donadores);
+        String json = new Gson().toJson(receptores);
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -74,10 +74,6 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        
-      
-        
         
     }
 

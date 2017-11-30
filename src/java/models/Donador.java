@@ -13,6 +13,7 @@ import java.sql.Date;
  */
 public class Donador {
     
+    private int id;
     private String nombre;
     private String apellidos;
     private Date fecha_nacimiento;
@@ -36,6 +37,19 @@ public class Donador {
         this.cp = cp;
     }
     
+    public Donador(int id, String nombre){
+        this.id = id;
+        this.nombre = nombre;
+    }
+    
+    
+    public int getId(){
+        return id;
+    }
+    
+    public void setId(int id){
+        this.id = id;
+    }
 
     public String getNombre() {
         return nombre;

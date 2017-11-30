@@ -63,6 +63,38 @@ public class ReceptorDAO {
         }
     }
     
+    public ArrayList<Receptor> search(String parameter, String value){
+      ArrayList<Receptor> result = null;
+        try {
+            statement = connection.prepareStatement("SELECT * FROM receptor WHERE ? = ?");
+            synchronized(statement) {
+                statement.setString(1, parameter);
+                statement.setString(2, value);
+            }
+            ResultSet rs = statement.executeQuery();
+            
+            
+            while (rs.next()){
+                Receptor receptor = new Receptor(
+                                        rs.getString(1),
+                                        rs.getString(2),
+                                        rs.getDate(3),
+                                        rs.getString(4),
+                                        rs.getString(5),
+                                        rs.getString(6),
+                                        rs.getString(7));
+                                                   
+                result.add(receptor);
+            }
+            
+        }
+        catch (SQLException sqle) {
+            logger.log(Level.SEVERE, sqle.toString(), sqle);
+            throw new RuntimeException(sqle);
+        }
+        return result;  
+    }
+    
     public ArrayList<Receptor> selectAll(){
     
         ArrayList<Receptor> receptores = new ArrayList<>();
@@ -72,7 +104,7 @@ public class ReceptorDAO {
             
             
             while (rs.next()){              
-                Receptor receptor = new Receptor(rs.getString("nombre"),rs.getString("apellidos"),rs.getDate("fecha_nacimiento"),rs.getString("sexo"),rs.getString("sangre"),rs.getString("diagnostico"), rs.getString("ubicacion"));           
+                Receptor receptor = new Receptor(rs.getInt("id"),rs.getString("nombre"),rs.getString("apellidos"),rs.getDate("fecha_nacimiento"),rs.getString("sexo"),rs.getString("sangre"),rs.getString("diagnostico"), rs.getString("ubicacion"));           
                 receptores.add(receptor);
             }
         }

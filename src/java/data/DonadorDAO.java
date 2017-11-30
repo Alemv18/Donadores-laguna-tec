@@ -67,7 +67,7 @@ public class DonadorDAO {
     public ArrayList<Donador> search(String parameter, String value){
       ArrayList<Donador> result = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM users WHERE ? = ?");
+            statement = connection.prepareStatement("SELECT * FROM donador WHERE ? = ?");
             synchronized(statement) {
                 statement.setString(1, parameter);
                 statement.setString(2, value);
@@ -111,6 +111,7 @@ public class DonadorDAO {
             
             while (rs.next()){              
                 Donador donador = new Donador(rs.getString("nombre"),rs.getString("apellidos"),rs.getDate("fecha_nacimiento"),rs.getString("sexo"),rs.getString("sangre"),rs.getString("email"),rs.getString("telefono"),rs.getString("direccion"), rs.getInt("cp"));           
+                donador.setId(rs.getInt("id"));
                 donadores.add(donador);
             }
         }

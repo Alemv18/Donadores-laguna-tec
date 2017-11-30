@@ -5,13 +5,16 @@
  */
 package servlets;
 
-import com.google.gson.Gson;
 import data.DBConnection;
 import data.DonadorDAO;
 import data.ReceptorDAO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,8 +27,8 @@ import models.Receptor;
  *
  * @author juans
  */
-@WebServlet(name = "Donadores", urlPatterns = {"/donadores"})
-public class Donadores extends HttpServlet {
+@WebServlet(name = "RegistroReceptorServlet", urlPatterns = {"/registroReceptor"})
+public class RegistroReceptorServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,6 +39,7 @@ public class Donadores extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -49,18 +53,7 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          //Make DB connection
-        DBConnection dbConn = new DBConnection();
-        Connection conn = dbConn.getConnection();
-
-        DonadorDAO donadorDao = new DonadorDAO(conn);
-        ArrayList<Donador> donadores = donadorDao.selectAll();
-
-        String json = new Gson().toJson(donadores);
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
     }
 
     /**
@@ -74,11 +67,49 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+         String url = "";
+        
+        //Parse birthdate before creating object
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        java.util.Date parsed = null;
+        try {
+            parsed = format.parse(request.getParameter("nacimiento"));
+        } catch (ParseException ex) {
+            Logger.getLogger(RegistroReceptorServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        java.sql.Date fechaNacimiento = new java.sql.Date(parsed.getTime());
+        
+        //Create receptor object
+        Receptor receptor = new Receptor(request.getParameter("nombre"),
+                                      request.getParameter("apellidoP") + " " +  request.getParameter("apellidoM"),
+                                      fechaNacimiento,
+                                      request.getParameter("sexo"),
+                                      request.getParameter("sangre2") + request.getParameter("sangre1"),
+                                      request.getParameter("diagnostico"),
+                                      request.getParameter("ubicacion"));
+                                      
         
         
-      
+         //Make DB connection
+        DBConnection dbConn = new DBConnection();
+        Connection conn = dbConn.getConnection();
+
+        ReceptorDAO receptorDao = new ReceptorDAO(conn);
+        receptorDao.insert(receptor);
+
+        Boolean isReg = true;
         
+        // set User object in request object and set URL
         
+        request.setAttribute("isReg", isReg);
+        request.setAttribute("donador", receptor);
+        url = "admin-site/index.html"; // the "thanks" page
+
+            
+        // forward request and response objects to specified URL
+        getServletContext()
+        .getRequestDispatcher(url)
+        .forward(request, response);
     }
 
     /**

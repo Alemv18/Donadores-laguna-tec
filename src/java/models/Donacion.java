@@ -13,15 +13,18 @@ import java.sql.Date;
  */
 public class Donacion {
     
+    private int id;
     private Receptor receptor;
     private Donador donador;
     private Date fecha_donacion;
     private String ubicacion;
     private String comentarios;
+    
 
-    public Donacion(Receptor receptor, Donador donador, Date fecha_donacion, String ubicacion, String comentarios) {
+    public Donacion(Receptor receptor, Donador donador, int id, Date fecha_donacion, String ubicacion, String comentarios) {
         this.receptor = receptor;
         this.donador = donador;
+        this.id = id;
         this.fecha_donacion = fecha_donacion;
         this.ubicacion = ubicacion;
         this.comentarios = comentarios;

@@ -9,23 +9,29 @@ import com.google.gson.Gson;
 import data.DBConnection;
 import data.DonadorDAO;
 import data.ReceptorDAO;
+import data.UserDAO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import models.Donador;
-import models.Receptor;
+import org.json.JSONObject;
 
 /**
  *
  * @author juans
  */
-@WebServlet(name = "Donadores", urlPatterns = {"/donadores"})
-public class Donadores extends HttpServlet {
+@WebServlet(name = "login", urlPatterns = {"/login"})
+public class login extends HttpServlet {
+    
+    private static final Logger logger = Logger.getLogger(login.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,6 +42,7 @@ public class Donadores extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+   
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -49,18 +56,7 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          //Make DB connection
-        DBConnection dbConn = new DBConnection();
-        Connection conn = dbConn.getConnection();
-
-        DonadorDAO donadorDao = new DonadorDAO(conn);
-        ArrayList<Donador> donadores = donadorDao.selectAll();
-
-        String json = new Gson().toJson(donadores);
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
     }
 
     /**
@@ -74,11 +70,40 @@ public class Donadores extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String url = "";
+        String message = "";
         
+        String user = request.getParameter("user");
+        String password = request.getParameter("password");
         
-      
+        logger.log(Level.SEVERE, "{0}{1}", new Object[]{user, password});
+        System.out.println(user+password);
         
+        JSONObject json = new JSONObject();
         
+        //Make DB connection
+         DBConnection dbConn = new DBConnection();
+         Connection conn = dbConn.getConnection();
+
+         UserDAO usuarioDao = new UserDAO(conn);
+         Boolean isAuth = usuarioDao.search(user, password, message);
+
+         if (isAuth){
+            
+            url = "admin-site/";
+            json.put("url", url);
+         }
+         else {
+             json.put("message", message);
+         }
+         
+
+        // forward request and response objects to specified URL
+        String resp = json.toString();
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(resp);
     }
 
     /**

@@ -65,20 +65,17 @@
     <!--Login form -->
     <div id="login-overlay" class="overlay">
       <div id="login-form">
-        <div class="close"></div>
-        <div class="input-wr">
-          <input type="email" name="email" placeholder="Correo Electrónico" required>
-          <div class="error-message">E-mail Inválido</div>
-        </div>
-        <div class="input-wr">
-          <input type="password" name="password" placeholder="Contraseña" required>
-          <div class="error-message">Password Inválido</div>
-        </div>
-        <button class="btn-submit">Ingresar</button>
-        <div class="create-account text-center">
-        <label id="verify-account"> Aún no tienes cuenta?</label>
-        <label id="create-new-account">Crear cuenta</label>
-        </div>
+          
+            <div class="close"></div>
+            <div class="input-wr">
+              <input id="usuarioU" type="text" name="user" placeholder="Correo Electrónico / Usuario" required>
+              <div class="error-message">E-mail Inválido</div>
+            </div>
+            <div class="input-wr">
+              <input id="passwordU" type="password" name="password" placeholder="Contraseña" required>
+              <div class="error-message">Password Inválido</div>
+            </div>
+            <button type=""  id="userSubmit" class="btn-submit">Ingresar</button>
       </div>
     </div>
     <!-- Intro Header -->
@@ -426,8 +423,8 @@
                 <h4 class="modal-title">Registro Exitoso</h4>
               </div>
               <div class="modal-body">
-                <p>Ya estás registrado como donador en Donadores Laguna. En cuanto lo necesitemos te contactaremos para agendar una donación. </p>
-                <p>Gracias por confiar en nosotros</p>
+                        <p>Ya estás registrado como donador en Donadores Laguna. En cuanto lo necesitemos te contactaremos para agendar una donación. </p>
+                        <p>Gracias por confiar en nosotros</p>                        
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
@@ -452,6 +449,31 @@
             });
         </script>
         </c:if>
+        <script>
+            $(document).ready(function(){
+                
+               $("#userSubmit").click(function(e){
+                   var data = {
+                       user: $("#usuarioU").val(),
+                       password: $("#passwordU").val()
+                   };
+                   console.log(data);
+                   $.post("login",
+                    data,
+                           function(response, status){
+                               console.log(response);
+                              if (response.hasOwnProperty("url")){
+                                  window.location.href = response.url;
+                              }
+                              else{
+                                  $(".modal-title").html("Acceso Denegado");
+                                  $(".modal-body").html(response.message);
+                                  $("#myModal").modal();
+                              }
+                           });
+               }); 
+            });
+        </script>
         <script src="js/index.js"></script>
         <script src="js/index.min.js"></script>
         <script src="js/log-in.js"></script>
