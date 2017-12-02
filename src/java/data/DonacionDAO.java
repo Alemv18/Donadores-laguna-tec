@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import models.Donacion;
 import models.Donador;
 import models.Receptor;
+import servlets.RegistroDonacionServlet;
 
 /**
  *
@@ -87,7 +88,7 @@ public class DonacionDAO {
         }
         catch (SQLException sqle) {
             logger.log(Level.SEVERE, sqle.toString(), sqle);
-            throw new RuntimeException(sqle);
+            RegistroDonacionServlet.message = "Hubo un error en el servidor, intente de nuevo más tarde";
         }
         return result;  
     }

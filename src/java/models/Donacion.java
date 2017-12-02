@@ -29,6 +29,14 @@ public class Donacion {
         this.ubicacion = ubicacion;
         this.comentarios = comentarios;
     }
+    
+    public Donacion(Receptor receptor, Donador donador, Date fecha_donacion, String ubicacion, String comentarios) {
+        this.receptor = receptor;
+        this.donador = donador;
+        this.fecha_donacion = fecha_donacion;
+        this.ubicacion = ubicacion;
+        this.comentarios = comentarios;
+    }
 
     public Receptor getReceptor() {
         return receptor;

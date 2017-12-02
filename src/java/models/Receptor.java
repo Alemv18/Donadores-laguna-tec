@@ -46,6 +46,10 @@ public class Receptor {
         this.nombre = name;
     }
     
+    public Receptor(int id){
+        this.id = id;
+    }
+    
     public Receptor(){
         
     }

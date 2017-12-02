@@ -42,6 +42,10 @@ public class Donador {
         this.nombre = nombre;
     }
     
+    public Donador(int id){
+        this.id = id;
+    }
+    
     
     public int getId(){
         return id;

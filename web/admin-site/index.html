@@ -140,8 +140,8 @@
                                     </tbody>
                                 </table>
                                 <div class="container" style="  align-items: center;   justify-content: center;   display: flex;">
-                                    <button id="donacion-btn" class="btn" style="display: none; font-size: large;   margin-top: 2em;   color: white;  background-color: orangered;">
-                                        Agregar/Editar</button>
+                                    <button id="agregarDonacion-btn" class="btn" style="display: none; font-size: large;   margin-top: 2em;   color: white;  background-color: orangered;">
+                                        Agregar</button>
                                 </div>
                             </div>
                         </div> <!-- .cd-project-info -->
@@ -179,7 +179,7 @@
                 $(document).ready(function(){
                     $("#btnDonadores").click(function() {
                       $.get("../donadores", function(response){
-                         $("#donadores-body").empty();
+                        
                          updateTable("donadores",response);
                          $("#donadores").show();
                          $("#donador-btn").show();
@@ -188,7 +188,7 @@
                     
                     $("#btnReceptores").click(function() {
                       $.get("../receptores", function(response){
-                            $("#receptores-body").empty();
+                            
                              updateTable("receptores",response);
 
                              $("#receptores").show();
@@ -203,14 +203,68 @@
                     $("#btnDonaciones").click(function() {
                       $.get("../donaciones", function(response){
                         
-                            $("#donaciones-body").empty();
-                            updateTable("donaciones",reponse);
+                            
+                            updateTable("donaciones",response);
                             $("#donaciones").show();
-                            $("#donacion-btn").show();
+                            $("#agregarDonacion-btn").show();
                          });  
                     });
                     
-                    
+                    $("#agregarDonacion-btn").click(function(){
+                        $.ajax({
+                            type:"GET",
+                            dataType: 'html',
+                            url: 'agregarDonacionModal.html',
+                            success: function(html){
+                                console.log(html);
+                                $(".modal-body").html(html);
+                                
+                                //HTML Cargado, añadir eventos y cargar informacion.
+                                
+                                $.get("../receptores", function(response){
+                                   
+                                        $.each(response, function(i, item) {
+                                            console.log(item, item.id);
+                                            $('#lista-receptores').append($('<option>').attr('value', item.id).text(`ID: ${item.id} || ${item.nombre} ${item.apellidos}`));
+                                        });
+                                     
+                                });
+                                
+                                $.get("../donadores", function(response){
+                                   
+                                        $.each(response, function(i, item) {
+                                            console.log(item, item.id);
+                                            $('#lista-donadores').append($('<option>').attr('value', item.id).text(`ID: ${item.id} || ${item.nombre} ${item.apellidos}`));
+                                        });
+                                     
+                                });
+                         
+                                $("#donacion-form").submit(function(e){
+                                    return false;
+                                });
+                                
+                                $("#donacion-submit").click(function(){
+                                    var data = $("#donacion-form").serialize();
+                                    console.log(data);
+                                    $.post("../registroDonacion",data,function(message, status){
+                                        console.log(message, status);
+                                        console.log("Status: " + status);
+                                        if (message){
+                                            window.prompt(message);
+                                        }
+                                        if (status === "success") {
+                                            $("#myModal").modal('hide');
+                                            $.get("../donaciones", function(response){
+                                                updateTable("donaciones", response);
+                                            });
+                                        }
+                                    });
+                                });
+                                
+                                $("#myModal").modal(); 
+                            }
+                        });
+                    });
                    
                     $("#agregarReceptor-btn").click(function(){
                        $.ajax({
@@ -234,7 +288,9 @@
                                         }
                                         if (status === "success") {
                                             $("#myModal").modal('hide');
-                                            updateTable("receptores");
+                                            $.get("../receptores", function(response){
+                                                updateTable("receptores", response);
+                                            });
                                         }
                                     });
                                 });
@@ -254,26 +310,35 @@
                             success: function(html){
                                 console.log(html);
                                 $(".modal-body").html(html);
-                                 $.get("../receptores", function(response){
+                                    $.get("../receptores", function(response){
                                    
-                                     $.each(response, function(i, item) {
-                                            $('#lista-receptores').append($('<option>').text(JSON.stringify(item))).attr('value', item.id);
-                                     });
+                                        $.each(response, function(i, item) {
+                                            console.log(item, item.id);
+                                            $('#lista-receptores').append($('<option>').attr('value', item.id).text(`ID: ${item.id} || ${item.nombre} ${item.apellidos}`));
+                                        });
+
+                                        $("#lista-receptores").change(function(){
+                                            console.log(response);
+                                            console.log("ID: " + $("#lista-receptores option:selected").val());
+                                            
+                                            console.log("receptor: " + response[$("#lista-receptores option:selected").val()]);
+                                            
+                                            var r = response.filter(function(receptor){
+                                                    return receptor.id.toString() === $("#lista-receptores option:selected").val();
+                                            });
+
+                                            console.log(r);
+                                            fillForm(r,"receptor");
+                                        });
                                      
-                                     $("#lista-receptores").change(function(){
-                                         
-                                         fillForm($("#lista-receptores").val(),"receptor");
-                                     })
-                                     
-                                      //console.log($tr.wrap('<p>').html());
-                                     });
+                                    });
                                 $("#receptor-form").submit(function(e){
                                     return false;
                                 });
                                 $("#receptor-submit").click(function(){
                                     var data = $("#receptor-form").serialize();
                                     console.log(data);
-                                    $.post("../registroReceptor",data,function(message, status){
+                                    $.post("../updateReceptor",data,function(message, status){
                                         console.log(message, status);
                                         console.log("Status: " + status);
                                         if (message){
@@ -281,10 +346,31 @@
                                         }
                                         if (status === "success") {
                                             $("#myModal").modal('hide');
-                                            updateTable("receptores");
+                                            $.get("../receptores",function(newResponse){
+                                                 updateTable("receptores", newResponse);
+                                            });
                                         }
                                     });
                                 });
+                                
+                                     
+                                $("#receptor-delete").click(function(){
+                                    var idR = $("#lista-receptores").val();
+                                    console.log(idR);
+                                    var data = {id: idR};
+                                    console.log(data);
+                                    $.post("../EliminarReceptor", data,function(message,status){
+                                        console.log("Status: " + status);
+                                        console.log(message);
+                                        if (status === "success"){
+                                            $.get("../receptores",function(newResponse){
+                                                updateTable("receptores", newResponse);
+                                           });
+
+                                        }    
+                                    });
+                                });
+                                     
                                 
                                 
                             }
@@ -293,12 +379,20 @@
                        $("#myModal").modal(); 
                     });
                     
-                    function fillForm(string,formId){
-                        var receptor = JSON.parse(string);
+                    function fillForm(receptor,formId){
+                        //console.log(string);
+                        //var receptor = JSON.parse(string);
+                        receptor = receptor[0];
                         $("#nombre-" + formId).val(receptor.nombre);
-                        $("#apellidoP-" + formId).val(receptor.apellidos);
+                        var apellidos = receptor.apellidos.split(" ")
+                        $("#apellidoP-" + formId).val(apellidos[0]);
+                        $("#apellidoM-" + formId).val(apellidos[1]);
                         
-                        $("#nacimiento-" + formId).val(receptor.fecha_nacimiento.toISOString());
+                        var ms = Date.parse(receptor.fecha_nacimiento);
+                        var fecha = new Date(ms).toISOString();
+                        var string = fecha.toString();
+                        var string = string.slice(0,10);
+                        $("#nacimiento-" + formId).val(string);
                         $("#sexo-" + formId).val(receptor.sexo);
                         (receptor.sangre.includes("-")) ? $("#sangre1-" + formId).val("-") : $("#sangre1-" + formId).val("+");
                         var matches = receptor.sangre.match(/[a-zA-Z]+/);
@@ -308,19 +402,62 @@
                     }
                     
                     function updateTable(id,response){
-                        $.each(response, function(i, item) {
-                            var $tr = $('<tr>').append(
-                                $('<td>').text(item.id),    
-                                $('<td>').text(item.nombre),
-                                $('<td>').text(item.apellidos),
-                                $('<td>').text(item.fecha_nacimiento),
-                                $('<td>').text(item.sexo),
-                                $('<td>').text(item.sangre),
-                                $('<td>').text(item.diagnostico),
-                                $('<td>').text(item.ubicacion)
+                        $("#" + id + "-body").empty();
+                        switch (id) {
+                            case "receptores":
+                                    $.each(response, function(i, item) {
 
-                            ).appendTo('#' + id);
-                        });
+                                        var $tr = $('<tr>').append(
+                                            $('<td>').text(item.id),    
+                                            $('<td>').text(item.nombre),
+                                            $('<td>').text(item.apellidos),
+                                            $('<td>').text(item.fecha_nacimiento),
+                                            $('<td>').text(item.sexo),
+                                            $('<td>').text(item.sangre),
+                                            $('<td>').text(item.diagnostico),
+                                            $('<td>').text(item.ubicacion)
+
+                                        ).appendTo('#' + id);
+                                    });
+                                    break;
+                                case "donadores":
+                                    $.each(response, function(i, item) {
+
+                                        var $tr = $('<tr>').append(
+                                            $('<td>').text(item.id),    
+                                            $('<td>').text(item.nombre),
+                                            $('<td>').text(item.apellidos),
+                                            $('<td>').text(item.fecha_nacimiento),
+                                            $('<td>').text(item.sexo),
+                                            $('<td>').text(item.sangre),
+                                            $('<td>').text(item.email),
+                                            $('<td>').text(item.telefono),
+                                            $('<td>').text(item.direccion),
+                                            $('<td>').text(item.cp)
+
+                                        ).appendTo('#' + id);
+                                    });
+                                    break;
+                                case "donaciones":
+                                    $.each(response, function(i, item) {
+
+                                        var $tr = $('<tr>').append(
+                                            $('<td>').text(item.receptor.id),
+                                            $('<td>').text(item.receptor.nombre),
+                                            $('<td>').text(item.donador.id),
+                                            $('<td>').text(item.donador.nombre),
+                                            $('<td>').text(item.id),
+                                            $('<td>').text(item.fecha_donacion),
+                                            $('<td>').text(item.ubicacion),
+                                            $('<td>').text(item.comentarios)
+
+                                        ).appendTo('#' + id);
+                                    });
+                                    break;
+                                default: 
+                                    console.log("Default");
+                        }
+                        
                     }
 
                 });

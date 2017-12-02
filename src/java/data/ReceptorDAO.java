@@ -9,12 +9,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Donador;
 import models.Receptor;
+import servlets.RegistroDonadorServlet;
 import servlets.RegistroReceptorServlet;
+import servlets.UpdateReceptorServlet;
 
 /**
  *
@@ -43,6 +47,24 @@ public class ReceptorDAO {
         this.connection = connection;
     }
     
+    public void delete(int id){
+        try { 
+            statement = connection.prepareStatement("DELETE FROM receptor WHERE id = ?");
+            synchronized(statement) {
+                statement.setInt(1, id);
+                statement.executeUpdate();
+            }
+            statement.close();
+            
+        }
+        catch (SQLException sqle) {
+            logger.log(Level.SEVERE, sqle.toString(), sqle);
+            RegistroReceptorServlet.message = "Error agregando receptor";
+            
+        }
+        
+    }
+    
     public void insert(Receptor receptor) {
         try { 
             statement = connection.prepareStatement("INSERT INTO receptor(nombre,apellidos,fecha_nacimiento,sexo,sangre,diagnostico,ubicacion) VALUES (?,?,?,?,?,?,?)");
@@ -62,6 +84,39 @@ public class ReceptorDAO {
         catch (SQLException sqle) {
             logger.log(Level.SEVERE, sqle.toString(), sqle);
             RegistroReceptorServlet.message = "Error agregando receptor";
+            
+        }
+    }
+    
+    public void update(Receptor receptor) {
+        try { 
+            statement = connection.prepareStatement("UPDATE receptor set "
+                                                        + "nombre = ?,"
+                                                        + "apellidos = ?,"
+                                                        + "fecha_nacimiento = ?,"
+                                                        + "sexo = ?,"
+                                                        + "sangre = ?,"
+                                                        + "diagnostico = ?,"
+                                                        + "ubicacion = ?"
+                                                        + " WHERE id = ?");
+            synchronized(statement) {
+                statement.setString(1, receptor.getNombre());
+                statement.setString(2, receptor.getApellidos());
+                statement.setDate(3, receptor.getFecha_nacimiento());
+                statement.setString(4, receptor.getSexo());
+                statement.setString(5, receptor.getSangre());
+                statement.setString(6, receptor.getDiagnostico());
+                statement.setString(7, receptor.getUbicacion());
+                statement.setInt(8, receptor.getId());
+                statement.executeUpdate();
+            }
+            statement.close();
+            
+        }
+        catch (SQLException sqle) {
+            logger.log(Level.SEVERE, sqle.toString(), sqle);
+            UpdateReceptorServlet.message = "Error actualizando receptor";
+            throw new RuntimeException(sqle);
             
         }
     }
